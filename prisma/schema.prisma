@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model affiliation {
+  employee_no     Int
+  organization_no Int
+  joined_at       DateTime?    @default(now()) @db.Timestamptz(6)
+  employee        employee     @relation(fields: [employee_no], references: [employee_no], onDelete: Cascade, onUpdate: NoAction)
+  organization    organization @relation(fields: [organization_no], references: [organization_no], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([employee_no, organization_no])
+}
+
+model employee {
+  employee_no                          Int           @id @default(autoincrement())
+  last_name                            String        @db.VarChar(100)
+  first_name                           String        @db.VarChar(100)
+  email                                String        @unique @db.VarChar(255)
+  created_at                           DateTime?     @default(now()) @db.Timestamptz(6)
+  auth_user_id                         String?       @db.Uuid
+  affiliation                          affiliation[]
+  ohgo_ohgo_employee_noToemployee      ohgo[]        @relation("ohgo_employee_noToemployee")
+  ohgo_ohgo_with_employee_noToemployee ohgo[]        @relation("ohgo_with_employee_noToemployee")
+}
+
+model ohgo {
+  id                                       Int            @id @default(autoincrement())
+  did_ohgo                                 Boolean
+  employee_no                              Int
+  with_employee_no                         Int?
+  did_at                                   DateTime       @default(now()) @db.Timestamptz(6)
+  vendingmachine_no                        Int
+  employee_ohgo_employee_noToemployee      employee       @relation("ohgo_employee_noToemployee", fields: [employee_no], references: [employee_no], onDelete: Cascade, onUpdate: NoAction)
+  vendingmachine                           vendingmachine @relation(fields: [vendingmachine_no], references: [vendingmachine_no], onDelete: Cascade, onUpdate: NoAction)
+  employee_ohgo_with_employee_noToemployee employee?      @relation("ohgo_with_employee_noToemployee", fields: [with_employee_no], references: [employee_no], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model organization {
+  organization_no   Int           @id @default(autoincrement())
+  organization_name String        @db.VarChar(200)
+  created_at        DateTime?     @default(now()) @db.Timestamptz(6)
+  affiliation       affiliation[]
+}
+
+model vendingmachine {
+  vendingmachine_no   Int       @id @default(autoincrement())
+  vendingmachine_name String    @db.VarChar(200)
+  created_at          DateTime? @default(now()) @db.Timestamptz(6)
+  ohgo                ohgo[]
+}
