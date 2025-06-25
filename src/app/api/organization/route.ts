@@ -1,27 +1,28 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
+export const main = async () => {
+  try {
+    await prisma.$connect();
+  } catch {
+    return Error("fail to connect DB");
+  }
+};
+
+// GET /api/organization
 export async function GET() {
   try {
+    await main();
+    // Fetch all organizations from the database
     const organizations = await prisma.organization.findMany({
       select: {
         organization_no: true,
         organization_name: true,
-        created_at: true,
-      },
-      orderBy: {
-        organization_name: 'asc',
       },
     });
-
     return NextResponse.json(organizations);
-  } catch (error) {
-    console.error("Failed to fetch organizations:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch organizations" },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

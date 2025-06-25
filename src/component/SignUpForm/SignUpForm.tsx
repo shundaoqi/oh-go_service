@@ -48,7 +48,7 @@ const SignUpForm = ({ organizationsList }: Props) => {
     }
     // ここでAPIを呼び出して、employeeとaffiliationを作成する
     try {
-      const response = await fetch("/api/user", {
+      const response = await fetch("/api/employee", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
