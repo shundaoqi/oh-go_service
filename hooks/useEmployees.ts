@@ -9,7 +9,7 @@ type Employee = {
 };
 
 const fetchEmployees = async (): Promise<Employee[]> => {
-  const response = await fetch("/api/user");
+  const response = await fetch("/api/employee");
   if (!response.ok) {
     throw new Error("Failed to fetch employees");
   }

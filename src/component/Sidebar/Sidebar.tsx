@@ -41,7 +41,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }
 
         // employeesテーブルのレコードを全件取得
-        const res_emp = await fetch("/api/user/");
+        const res_emp = await fetch("/api/employee/");
         const employees: Employee[] = await res_emp.json();
 
         if (!employees || !Array.isArray(employees)) {
@@ -62,7 +62,7 @@ const Sidebar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         const userFullName = `${emp.last_name} ${emp.first_name}`;
 
         // 所属組織名を取得
-        const res_org = await fetch(`/api/user/${userId}`);
+        const res_org = await fetch(`/api/employee/${userId}`);
         const orgData = await res_org.json();
         const organization_name = orgData.organization_name;
 
