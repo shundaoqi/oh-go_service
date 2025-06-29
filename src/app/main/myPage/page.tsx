@@ -1,7 +1,7 @@
-import FloorOhgoBox from "@/component/OhgoBox/OhgoBox";
 import Sidebar from "@/component/Sidebar/Sidebar";
 import { Stack } from "@mui/material";
 import { VendingMachine } from "../../../../type/type";
+import FloorOhgoBox from "@/component/FloorOhgoBox/FloorOhgoBox";
 
 const fetchAllVending = async () => {
   const res = await fetch("http://localhost:3000/api/vending");
@@ -19,7 +19,7 @@ const mypage = async () => {
           {vendingData.length > 0 ? (
             vendingData.map((vending: VendingMachine) => (
               <div key={vending.vendingmachine_no}>
-                <FloorOhgoBox floor={vending.vendingmachine_name} />
+                <FloorOhgoBox floor={vending.vendingmachine_name} floor_no={vending.vendingmachine_no} />
               </div>
             ))
           ) : (

@@ -12,21 +12,68 @@ import {
 import { useState } from "react";
 import CalenderPicker from "../CalenderPicker/CalenderPicker";
 import EmployeesAutocomplete from "./EmployeesAutocomplete";
+import supabase from "../../../lib/supabase";
+import { Employee } from "../../../type/type";
+
+const registerOhgo = async (with_employee_no: number, floor_no: number) => {
+  // ログインしているユーザーのauth.user.idを取得
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    throw new Error("ユーザー情報の取得に失敗しました");
+  }
+
+  const res_user = await fetch(
+    `/api/employee?auth_user_id=${encodeURIComponent(user.id)}`,
+    {
+      method: "GET",
+    }
+  );
+
+  const employees = await res_user.json();
+  const employee_no =
+    Array.isArray(employees) && employees.length > 0
+      ? employees[0].employee_no
+      : undefined;
+
+  const res_ohgo = await fetch("/api/ohgo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      employee_no: employee_no,
+      with_employee_no: with_employee_no,
+      vendingmachine_no: floor_no,
+    }),
+  });
+  return res_ohgo.ok;
+};
 
 interface FloorOhgoBoxProps {
   floor: string;
+  floor_no: number;
 }
-const FloorOhgoBox = ({ floor }: FloorOhgoBoxProps) => {
+
+const FloorOhgoBox = ({ floor, floor_no }: FloorOhgoBoxProps) => {
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [checked, setChecked] = useState<boolean>(true);
+  const [withEmployee, setWithEmployee] = useState<Employee | null>(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
   };
 
+  const handleWithEmployeeChange = (employee: Employee | null) => {
+    setWithEmployee(employee);
+  };
+
   const handleRegister = () => {
-    // ここでOh-GoのデータをPostするよ
-    setSnackBarOpen(true);
+    if (withEmployee) {
+      registerOhgo(withEmployee.employee_no, floor_no);
+      setSnackBarOpen(true);
+    }
   };
 
   return (
@@ -50,10 +97,12 @@ const FloorOhgoBox = ({ floor }: FloorOhgoBoxProps) => {
 
         <CalenderPicker />
       </Stack>
-
       <Switch checked={checked} onChange={handleChange} />
 
-      <EmployeesAutocomplete />
+      <EmployeesAutocomplete
+        value={withEmployee}
+        handleChange={handleWithEmployeeChange}
+      />
 
       <Button variant="contained" onClick={handleRegister}>
         登録

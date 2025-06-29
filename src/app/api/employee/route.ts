@@ -54,9 +54,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const authUserId =
+      req.nextUrl.searchParams.get("auth_user_id") ?? undefined;
+    console.log("authUserId:", authUserId);
+
+    const where = authUserId ? { auth_user_id: authUserId } : undefined;
+
     const employees = await prisma.employee.findMany({
+      where,
       select: {
         employee_no: true,
         first_name: true,
@@ -65,6 +72,7 @@ export async function GET() {
         auth_user_id: true,
       },
     });
+    console.log("employees:", employees);
     return NextResponse.json(employees, { status: 200 });
   } catch (error: unknown) {
     let message = "Internal Server Error";

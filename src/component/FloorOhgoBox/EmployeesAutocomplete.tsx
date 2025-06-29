@@ -2,8 +2,14 @@
 
 import { Autocomplete, TextField } from "@mui/material";
 import { useEmployees } from "../../../hooks/useEmployees";
+import { Employee } from "../../../type/type";
 
-const EmployeesAutocomplete = () => {
+type Props = {
+  value: Employee | null;
+  handleChange: (employee: Employee | null) => void;
+};
+
+const EmployeesAutocomplete = ({ value, handleChange }: Props) => {
   const { employees, error } = useEmployees();
 
   if (error) return <p>Error: {error}</p>;
@@ -13,13 +19,19 @@ const EmployeesAutocomplete = () => {
       disablePortal
       options={employees}
       getOptionLabel={(option) =>
-        `${option.last_name} ${option.first_name} (${option.employee_no})`
+        option
+          ? `${option.last_name} ${option.first_name} (${option.employee_no.toString()})`
+          : ""
       }
       sx={{
         width: 300,
         "& .MuiOutlinedInput-root": {
-          backgroundColor: "white", // 背景色を白に設定
+          backgroundColor: "white",
         },
+      }}
+      value={value}
+      onChange={(_event, newValue) => {
+        handleChange(newValue);
       }}
       renderInput={(params) => <TextField {...params} label="誰と？" />}
     />
