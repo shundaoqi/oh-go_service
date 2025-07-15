@@ -58,7 +58,6 @@ export async function GET(req: NextRequest) {
   try {
     const authUserId =
       req.nextUrl.searchParams.get("auth_user_id") ?? undefined;
-    console.log("authUserId:", authUserId);
 
     const where = authUserId ? { auth_user_id: authUserId } : undefined;
 
@@ -72,7 +71,6 @@ export async function GET(req: NextRequest) {
         auth_user_id: true,
       },
     });
-    console.log("employees:", employees);
     return NextResponse.json(employees, { status: 200 });
   } catch (error: unknown) {
     let message = "Internal Server Error";

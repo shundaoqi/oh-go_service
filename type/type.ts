@@ -15,3 +15,13 @@ export type Employee = {
   email: string;
   auth_user_id: string;
 };
+
+export interface OhgoVisualizationRow {
+  with_employee_name: string | null;
+  organization_no: string | null;
+  [key: `vendingmachine_${number}`]: boolean;
+}
+
+export interface OhgoVisualizationResponse {
+  data: OhgoVisualizationRow[];
+}
