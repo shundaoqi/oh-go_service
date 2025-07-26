@@ -1,12 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-
-type Employee = {
-  employee_no: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-};
+import { Employee } from "../type/type";
 
 const fetchEmployees = async (): Promise<Employee[]> => {
   const response = await fetch("/api/employee");

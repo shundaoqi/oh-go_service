@@ -1,18 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 
-export const main = async () => {
-  try {
-    await prisma.$connect();
-  } catch {
-    return Error("fail to connect DB");
-  }
-};
-
 // GET /api/organization
 export async function GET() {
   try {
-    await main();
     // Fetch all organizations from the database
     const organizations = await prisma.organization.findMany({
       select: {

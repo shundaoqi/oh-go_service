@@ -20,8 +20,9 @@ const SendEmail = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "http://localhost:3000/auth/login", // 本番URLに合わせて変更
+        redirectTo: `${baseUrl}/auth/login`,
       });
       if (error) throw error;
       setSent(true);

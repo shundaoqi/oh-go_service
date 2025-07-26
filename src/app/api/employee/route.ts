@@ -1,14 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 
-export const main = async () => {
-  try {
-    await prisma.$connect();
-  } catch {
-    return Error("fail to connect DB");
-  }
-};
-
 export async function POST(req: NextRequest) {
   try {
     const { email, lastName, firstName, organization } = await req.json();

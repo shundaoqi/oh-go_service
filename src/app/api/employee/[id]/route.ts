@@ -1,24 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "../../../../../lib/prisma";
 
-export const main = async () => {
-  try {
-    await prisma.$connect();
-  } catch {
-    return Error("fail to connect DB");
-  }
-};
-
 // GET /api/user/[id]
 // 社員番号から組織番号と組織名を取得するAPI
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { params } = context;
-    const awaitedParams = await params;
-    const employeeNo = Number(awaitedParams.id);
+    const { id } = await params;
+    const employeeNo = Number(id);
     if (isNaN(employeeNo)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }

@@ -3,8 +3,11 @@ import { Stack } from "@mui/material";
 import { VendingMachine } from "../../../../type/type";
 import FloorOhgoBox from "@/component/FloorOhgoBox/FloorOhgoBox";
 
+export const dynamic = 'force-dynamic';
+
 const fetchAllVending = async () => {
-  const res = await fetch("http://localhost:3000/api/vending");
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const res = await fetch(`${baseUrl}/api/vending`);
   if (!res.ok) throw new Error("Failed to fetch vending data");
   return res.json();
 };

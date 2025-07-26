@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(timeout 60 npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npx next lint:*)",
+      "Bash(npm run build:*)",
+      "Bash(rm:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(NEXT_PUBLIC_API_URL=http://localhost:3000 npm run build)"
+    ],
+    "deny": []
+  }
+}
