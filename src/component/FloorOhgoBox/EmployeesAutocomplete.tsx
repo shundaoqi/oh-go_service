@@ -6,21 +6,26 @@ import { Employee } from "../../../type/type";
 
 type Props = {
   value: Employee | null;
+  employeeNo: number | null;
   handleChange: (employee: Employee | null) => void;
 };
 
-const EmployeesAutocomplete = ({ value, handleChange }: Props) => {
-  const { employees, error } = useEmployees();
+const EmployeesAutocomplete = ({ value, employeeNo, handleChange }: Props) => {
+  const { employees } = useEmployees();
+  const filteredEmployees = employees.filter(
+    (employee) => Number(employee.employee_no) !== employeeNo
+  );
 
-  if (error) return <p>Error: {error}</p>;
 
   return (
     <Autocomplete
       disablePortal
-      options={employees}
+      options={filteredEmployees}
       getOptionLabel={(option) =>
         option
-          ? `${option.last_name} ${option.first_name} (${option.employee_no.toString()})`
+          ? `${option.last_name} ${
+              option.first_name
+            } (${option.employee_no.toString()})`
           : ""
       }
       sx={{

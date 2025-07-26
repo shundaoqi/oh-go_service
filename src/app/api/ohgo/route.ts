@@ -74,76 +74,76 @@ async function handleVisualization(req: NextRequest) {
     const startDate = new Date(`${dateParam}T00:00:00.000Z`);
     const endDate = new Date(`${dateParam}T23:59:59.999Z`);
 
-  const ohgoRecords = await prisma.ohgo.findMany({
-    where: {
-      employee_no: employee_no,
-      did_at: {
-        gte: startDate,
-        lte: endDate,
+    const ohgoRecords = await prisma.ohgo.findMany({
+      where: {
+        employee_no: employee_no,
+        did_at: {
+          gte: startDate,
+          lte: endDate,
+        },
       },
-    },
-    include: {
-      employee_ohgo_with_employee_noToemployee: {
-        include: {
-          affiliation: {
-            include: {
-              organization: true,
+      include: {
+        employee_ohgo_with_employee_noToemployee: {
+          include: {
+            affiliation: {
+              include: {
+                organization: true,
+              },
             },
           },
         },
+        vendingmachine: true,
       },
-      vendingmachine: true,
-    },
-  });
+    });
 
-  const allVendingMachines = await prisma.vendingmachine.findMany({
-    orderBy: {
-      vendingmachine_no: 'asc',
-    },
-  });
+    const allVendingMachines = await prisma.vendingmachine.findMany({
+      orderBy: {
+        vendingmachine_no: "asc",
+      },
+    });
 
-  const groupedData = new Map();
+    const groupedData = new Map();
 
-  ohgoRecords.forEach((record) => {
-    if (!record.did_ohgo) return;
+    ohgoRecords.forEach((record) => {
+      if (!record.did_ohgo) return;
 
-    const key = record.with_employee_no?.toString() || "null";
+      const key = record.with_employee_no?.toString() || "null";
 
-    if (!groupedData.has(key)) {
-      let withEmployeeName = null;
-      let organizationDisplay = null;
+      if (!groupedData.has(key)) {
+        let withEmployeeName = null;
+        let organizationDisplay = null;
 
-      if (
-        record.with_employee_no &&
-        record.employee_ohgo_with_employee_noToemployee
-      ) {
-        const withEmployee = record.employee_ohgo_with_employee_noToemployee;
-        withEmployeeName = `${withEmployee.last_name}${withEmployee.first_name}`;
+        if (
+          record.with_employee_no &&
+          record.employee_ohgo_with_employee_noToemployee
+        ) {
+          const withEmployee = record.employee_ohgo_with_employee_noToemployee;
+          withEmployeeName = `${withEmployee.last_name}${withEmployee.first_name}`;
 
-        if (withEmployee.affiliation && withEmployee.affiliation.length > 0) {
-          const firstAffiliation = withEmployee.affiliation[0];
-          if (firstAffiliation.organization) {
-            organizationDisplay =
-              firstAffiliation.organization.organization_name;
+          if (withEmployee.affiliation && withEmployee.affiliation.length > 0) {
+            const firstAffiliation = withEmployee.affiliation[0];
+            if (firstAffiliation.organization) {
+              organizationDisplay =
+                firstAffiliation.organization.organization_name;
+            }
           }
         }
+
+        const vendingMachineColumns: Record<string, boolean> = {};
+        allVendingMachines.forEach((vm) => {
+          vendingMachineColumns[vm.vendingmachine_no] = false;
+        });
+
+        groupedData.set(key, {
+          with_employee_name: withEmployeeName,
+          organization_no: organizationDisplay,
+          ...vendingMachineColumns,
+        });
       }
 
-      const vendingMachineColumns: Record<string, boolean> = {};
-      allVendingMachines.forEach((vm) => {
-        vendingMachineColumns[`vendingmachine_${vm.vendingmachine_no}`] = false;
-      });
-
-      groupedData.set(key, {
-        with_employee_name: withEmployeeName,
-        organization_no: organizationDisplay,
-        ...vendingMachineColumns,
-      });
-    }
-
-    const data = groupedData.get(key);
-    data[`vendingmachine_${record.vendingmachine_no}`] = true;
-  });
+      const data = groupedData.get(key);
+      data[record.vendingmachine.vendingmachine_no] = true;
+    });
 
     const result = Array.from(groupedData.values());
 

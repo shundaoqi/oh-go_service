@@ -9,35 +9,14 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CalenderPicker from "../CalenderPicker/CalenderPicker";
 import EmployeesAutocomplete from "./EmployeesAutocomplete";
-import supabase from "../../../lib/supabase";
-import { Employee } from "../../../type/type";
+import { Employee, FloorOhgoBoxProps } from "../../../type/type";
+import { getEmployeeNo } from "../../../util/function";
 
 const registerOhgo = async (with_employee_no: number, floor_no: number) => {
-  // ログインしているユーザーのauth.user.idを取得
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new Error("ユーザー情報の取得に失敗しました");
-  }
-
-  const res_user = await fetch(
-    `/api/employee?auth_user_id=${encodeURIComponent(user.id)}`,
-    {
-      method: "GET",
-    }
-  );
-
-  const employees = await res_user.json();
-  const employee_no =
-    Array.isArray(employees) && employees.length > 0
-      ? employees[0].employee_no
-      : undefined;
+  const employee_no = await getEmployeeNo();
 
   const res_ohgo = await fetch("/api/ohgo", {
     method: "POST",
@@ -51,12 +30,17 @@ const registerOhgo = async (with_employee_no: number, floor_no: number) => {
   return res_ohgo.ok;
 };
 
-interface FloorOhgoBoxProps {
-  floor: string;
-  floor_no: number;
-}
-
 const FloorOhgoBox = ({ floor, floor_no }: FloorOhgoBoxProps) => {
+  const [employeeNo, setEmployeeNo] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchEmployeeNo = async () => {
+      const employeeNo_tmp = await getEmployeeNo(); // 非同期の場合
+      setEmployeeNo(employeeNo_tmp !== undefined ? employeeNo_tmp : null);
+    };
+    fetchEmployeeNo();
+  }, [employeeNo]);
+
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [checked, setChecked] = useState<boolean>(true);
   const [withEmployee, setWithEmployee] = useState<Employee | null>(null);
@@ -100,6 +84,7 @@ const FloorOhgoBox = ({ floor, floor_no }: FloorOhgoBoxProps) => {
       <Switch checked={checked} onChange={handleChange} />
 
       <EmployeesAutocomplete
+        employeeNo={employeeNo}
         value={withEmployee}
         handleChange={handleWithEmployeeChange}
       />

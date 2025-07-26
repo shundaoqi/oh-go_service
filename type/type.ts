@@ -16,12 +16,25 @@ export type Employee = {
   auth_user_id: string;
 };
 
-export interface OhgoVisualizationRow {
+export type OhgoVisualizationRow = {
   with_employee_name: string | null;
   organization_no: string | null;
   [key: `vendingmachine_${number}`]: boolean;
-}
+};
 
-export interface OhgoVisualizationResponse {
+export type OhgoVisualizationResponse = {
   data: OhgoVisualizationRow[];
-}
+};
+
+export type FloorOhgoBoxProps = {
+  floor: string;
+  floor_no: number;
+};
+
+export type Ohgo = {
+  ohgo_no: number;
+  employee_no: number;
+  with_employee_no: number | null;
+  vendingmachine_no: number;
+  did_ohgo: boolean;
+};
